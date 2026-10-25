@@ -1,0 +1,69 @@
+name: Verify and deploy Last Flag Standing to Oracle
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: oracle-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Test and build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund --legacy-peer-deps
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build frontend
+        run: npm run build
+
+  deploy:
+    name: Queue safe Oracle deployment
+    needs: verify
+    if: ${{ github.ref == 'refs/heads/main' && vars.ORACLE_AUTO_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Queue deployment on Oracle
+        env:
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_USER: ${{ secrets.ORACLE_USER }}
+          ORACLE_DEPLOY_KEY: ${{ secrets.ORACLE_DEPLOY_KEY }}
+          ORACLE_KNOWN_HOSTS: ${{ secrets.ORACLE_KNOWN_HOSTS }}
+          DEPLOY_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          : "${ORACLE_HOST:?Add repository secret ORACLE_HOST}"
+          : "${ORACLE_USER:?Add repository secret ORACLE_USER}"
+          : "${ORACLE_DEPLOY_KEY:?Add repository secret ORACLE_DEPLOY_KEY}"
+          : "${ORACLE_KNOWN_HOSTS:?Add repository secret ORACLE_KNOWN_HOSTS}"
+
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$ORACLE_DEPLOY_KEY" > "$HOME/.ssh/oracle_deploy"
+          printf '%s\n' "$ORACLE_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/oracle_deploy" "$HOME/.ssh/known_hosts"
+
+          ssh -i "$HOME/.ssh/oracle_deploy" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$ORACLE_USER@$ORACLE_HOST" \
+            "\$HOME/.local/bin/lfs-queue-deploy $DEPLOY_SHA"
+
+          rm -f "$HOME/.ssh/oracle_deploy"
