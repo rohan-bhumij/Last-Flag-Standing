@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Barlow Condensed', system-ui, sans-serif;
+    --font-sans: 'Outfit', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: #050814;
+    color: #f1f5f9;
+    user-select: none;
+  }
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.stroke-text {
+  paint-order: stroke fill;
+  -webkit-text-stroke: 3px rgba(4, 7, 20, 0.92);
+}
+
+@keyframes subscriberCardLifecycle {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.78);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(2px) scale(1.05);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  84% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.84);
+  }
+}
+
+@keyframes subscriberDiamondLifecycle {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.35);
+  }
+  14% {
+    opacity: 1;
+    transform: translateY(3px) scale(1.16);
+  }
+  24% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+  52% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1.06);
+  }
+  82% {
+    opacity: 1;
+    transform: translateY(0px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.35);
+  }
+}
+
+.animate-subscriber-card {
+  animation: subscriberCardLifecycle 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-subscriber-diamond {
+  animation: subscriberDiamondLifecycle 3.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+

@@ -1,0 +1,6 @@
+{
+  "name": "Global Flag Arena — Live Broadcast Simulation",
+  "description": "A 64-country real-time physics battle arena and interactive YouTube Live broadcast simulation with spoken commentary, central hazard aperture, and live chat country support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
