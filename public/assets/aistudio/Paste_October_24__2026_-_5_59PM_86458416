@@ -1,0 +1,598 @@
+# BUILD: GLOBAL FLAG ARENA — A CINEMATIC, INTERACTIVE YOUTUBE LIVESTREAM SIMULATION
+
+You are acting as a senior creative director, real-time simulation engineer, broadcast graphics designer, audio designer, full-stack engineer and cloud deployment architect.
+
+Build a complete, visually spectacular, interactive **64-country flag battle arena** inspired by the attached reference screenshot.
+
+This is not a static design mockup, a dashboard with a game embedded inside it, or a generic bouncing-ball experiment. It is intended to become a persistent YouTube livestream experience in which viewers can follow countries, anticipate dangerous events, watch actual eliminations, hear country names announced, interact through live chat and receive real event-based acknowledgements.
+
+The reference screenshot is the primary visual direction. Reproduce its overall composition, hierarchy, arena geometry, energy and broadcast atmosphere, but develop original Global Flag Arena branding, interface assets, background artwork and animations. Do not reproduce the reference channel's logo or claim to own its artwork.
+
+## NON-NEGOTIABLE SUCCESS CRITERIA
+
+1. Sixty-four recognizable country flags appear inside a convincing circular physics arena.
+2. Country tokens move at a readable speed and collide naturally with the arena boundary, rotating barriers and one another.
+3. Eliminations are caused by actual game mechanics rather than scripted outcomes.
+4. Every confirmed elimination triggers a visible announcement and genuinely audible spoken commentary naming the eliminated country.
+5. Viewers experience anticipation before each hazard event, rather than watching endless chaotic movement.
+6. Real YouTube Live Chat events affect the running simulation and produce accurate acknowledgements.
+7. Subscriber alerts only claim success when supported by real event data. Unknown, unavailable or private subscriber events must not be fabricated.
+8. The application supports a proper horizontal 16:9 broadcast and a separately composed vertical 9:16 broadcast.
+9. The application can be deployed to Google Cloud, with a documented, technically valid route to sending the rendered audio/video stream to YouTube Live.
+10. The finished result must be tested in a running application. Passing unit tests alone is not sufficient.
+
+Do not claim a feature is working merely because a placeholder, button, mock API response or simulated event exists.
+
+---
+
+# 1. VISUAL DIRECTION — FOLLOW THE ATTACHED REFERENCE
+
+Study the attached screenshot before writing the visual implementation. Use it as the reference for the in-stream presentation.
+
+## Arena
+
+Create a central, circular arena featuring:
+
+- A deep midnight-blue and near-black playfield with convincing depth.
+- A crisp, luminous cyan outer circumference.
+- Multiple purple radial deflector bars rotating through the arena.
+- A circular central floor opening with a distinctive hot-magenta energy ring.
+- Sixty-four country tokens containing recognizable national flag artwork, each inside a clearly visible circular disc.
+- Realistic light falloff, controlled bloom, surface reflections, subtle metallic materials, contact shadows and depth.
+- A dark, atmospheric stadium environment surrounding the arena, with original high-energy crowd, lighting and world-competition imagery.
+
+The cyan boundary, purple deflectors and magenta central hazard must be immediately recognizable. Preserve these defining elements throughout the design.
+
+The background must remain visually impressive without reducing flag readability. Avoid excessive particle effects, overexposed glow, motion blur over flags or high-frequency textures that make the arena difficult to follow.
+
+Use a coherent lighting and material system. Avoid emoji flags, generic coloured circles, crude gradients as a substitute for artwork, arbitrary geometric decoration, default browser controls and unfinished placeholder panels.
+
+### Flag assets
+
+Use a consistent local SVG or high-resolution raster flag asset for each of the 64 countries.
+
+Every token must display the correct flag. Country abbreviations, names and flag assets must use a single authoritative country manifest with verified mappings.
+
+Do not depend on remote image URLs at runtime. Provide a local asset manifest, asset-loading validation and a visible diagnostic for any missing flag.
+
+The flags must stay correctly oriented while the tokens move and rotate.
+
+### Cinematic presentation
+
+Make the scene feel like a live international competition:
+
+- Dramatic arena lighting.
+- Distinctive hazard effects.
+- Controlled camera emphasis on important moments.
+- An accelerating visual rhythm before the opening.
+- A satisfying physical fall and elimination effect.
+- Clean transitions between matches.
+- A high-impact final-country victory reveal.
+
+Visual effects must never alter the underlying physics or fabricate an outcome.
+
+---
+
+# 2. COMPOSITION FOR TWO BROADCAST FORMATS
+
+Implement two genuinely different compositions driven by the same simulation state.
+
+## Horizontal broadcast
+
+Target output: 1920 × 1080, 16:9.
+
+Create a complete television-style competition composition with the circular arena as the principal focal point. Use cinematic side panels for useful country information, support rankings, upcoming hazards, recent eliminations and appropriate broadcast artwork.
+
+Do not simply stretch the vertical layout across a wide canvas. Use the available horizontal space intentionally.
+
+The arena must remain large enough for viewers to follow collisions and understand which country is in danger.
+
+## Vertical broadcast
+
+Target output: 1080 × 1920, 9:16.
+
+Create a dedicated vertical composition inspired by the screenshot's tall central gameplay panel.
+
+Prioritize the arena, top-level statistics, the next-event countdown, the latest elimination, support information and a compact elimination history. Keep important information inside mobile-safe margins.
+
+Do not produce a horizontal layout with most of its content cropped out. Redesign the arrangement for vertical viewing.
+
+## Broadcast controls
+
+Provide separate preview routes or explicit layout controls for both formats. Keep all underlying match state, country positions, scores, elimination records and YouTube event processing consistent across formats.
+
+Create a clean broadcast mode without administrative controls, debug text or development overlays. The spectator-facing output must look like a finished, professionally art-directed stream.
+
+---
+
+# 3. INITIAL GAME RULES
+
+Start with 64 countries, all represented by correctly mapped flag tokens.
+
+Use a real 2D physics engine with continuous frame updates and actual collision bodies. Prefer Phaser 3 with Matter.js for the game simulation, with React and TypeScript for the application shell, control interface and broadcast overlays. If you choose a different stack, explain the specific technical reason before changing it.
+
+## Physical behaviour
+
+- All 64 countries spawn inside the arena.
+- Each token has a defined physical radius, mass, restitution and velocity.
+- Tokens collide with one another, the perimeter, and rotating deflector bars.
+- Deflector bars rotate continuously and transfer momentum through genuine collisions.
+- Tokens may naturally form clusters, separate, change direction and enter dangerous positions.
+- Keep movement readable. Use configurable velocity limits and tune the initial motion using actual recordings rather than arbitrary assumptions.
+- Prevent tokens escaping the circular boundary through numerical instability.
+- Never teleport tokens to manufacture collisions or rescue a contestant.
+- Never secretly determine the winner.
+
+The simulation must continue independently of YouTube chat activity. The livestream should remain entertaining when there are few viewers and no new chat messages.
+
+## Central hatch
+
+Use the reference's central opening as the primary elimination hazard.
+
+Make its timing configurable through an administrative settings panel. Use an initial preset of a six-second cycle, with five seconds closed and one second open.
+
+During the closed phase, the hatch is physically solid.
+
+During the open phase, the floor collision disappears over the aperture so an eligible token can fall through under gravity. Confirm elimination only after the token passes below a defined elimination plane.
+
+A token may fall only when its entire circular footprint fits inside the aperture. If token radius is `r`, opening radius is `R`, and the centre distance from the opening is `d`, require:
+
+`d + r <= R`
+
+A token whose footprint overlaps the rim must not be arbitrarily eliminated.
+
+Make the fall convincing: show downward depth, appropriate occlusion, scaling and lighting as the token descends. The animation must agree with the physics state, not merely shrink a sprite to pretend a fall occurred.
+
+Closing the hatch must not teleport a token or cancel an already-confirmed fall.
+
+## Match lifecycle
+
+Use an explicit state machine:
+
+`READY → INTRO → ACTIVE MATCH → HAZARD WARNING → HATCH OPEN → ELIMINATION CONFIRMED → ANNOUNCEMENT → ACTIVE MATCH → FINALISTS → WINNER REVEAL → NEXT MATCH`
+
+Begin a fresh match with exactly 64 contestants. Declare a winner only when the simulation has confirmed that one contestant remains.
+
+Never issue a winner announcement while contestants are still spawning or while the match is in an invalid state.
+
+After the winner reveal, allow an adjustable transition period and start the next match automatically. Keep cumulative session victories separate from each individual match's state.
+
+Persist session records and win totals in a server-side database so a browser refresh does not erase them. Provide a new-session/reset control protected by administrative confirmation.
+
+---
+
+# 4. A LIVE EVENT, NOT JUST A BOUNCING SIMULATION
+
+Every hazard event should build tension.
+
+Before each opening:
+
+- Display a prominent next-hazard countdown.
+- Introduce a warning phase approximately two seconds before opening.
+- Add a distinct, escalating countdown sound during the final seconds.
+- Illuminate the central ring in a controlled sequence.
+- Use a subtle mechanical wind-up, energy build-up or atmospheric cue.
+- Keep the remaining-country counter visible.
+- Make the opening and its consequences visually distinct.
+
+During the opening, the audience should be able to understand which flags are close to the aperture. Use selective visual emphasis when justified by actual token position. Never highlight a country as doomed if the simulation has not established that it is in danger.
+
+Use natural variation to keep matches from feeling repetitive. The arena must not follow a predetermined elimination schedule.
+
+As the number of contestants decreases, gradually increase the visual emphasis on surviving countries. The final five and final two should feel significantly more dramatic than the opening stages.
+
+The final winner should receive a dedicated victory sequence with the country's large flag, name, celebratory animation, audio fanfare and cumulative win total.
+
+---
+
+# 5. REAL-TIME ELIMINATION ANNOUNCEMENTS AND COMMENTARY
+
+This is a core feature.
+
+Whenever the physics engine confirms that a country has been eliminated, dispatch one uniquely identified elimination event.
+
+That event must trigger:
+
+1. The eliminated country's flag and full country name in a prominent announcement banner.
+2. An audible spoken commentary line identifying that country.
+3. A distinct elimination sound effect.
+4. An updated remaining-country counter.
+5. An entry in the elimination history and event log.
+6. A correct progress indicator and updated support information.
+7. A suitably timed transition back into gameplay.
+
+### Example commentary
+
+Use dynamic values and natural variation. Example lines include:
+
+- “NEPAL IS OUT! Nepal's journey in the arena has come to an end. Forty-two countries remain!”
+- “WHAT A MOMENT! ARGENTINA HAS FALLEN! The field is getting smaller, and the next opening could change everything!”
+- “THE FINAL FIVE! Just five countries remain. Who is going to survive this next opening?”
+- “INCREDIBLE! INDIA WINS GLOBAL FLAG ARENA! India takes the crown, and that is another match victory!”
+
+These are examples of style, not fixed text to repeat in every match.
+
+The announcer must accurately use the eliminated country's name and the count of countries still in the match. Do not confuse a supporter, chat author or event donor with the country being eliminated.
+
+### Commentary architecture
+
+Create a dedicated commentary service with:
+
+- A configurable announcer voice and delivery style.
+- A queue for speech events.
+- Correct event ordering and deduplication.
+- Priorities for elimination and winner announcements.
+- A sensible policy for batching or shortening commentary when several events happen close together.
+- Separate controls for commentary, music, impacts, hazard sounds and subscriber alerts.
+- A diagnostic state showing pending speech, completed speech and errors.
+
+Use Gemini text-to-speech where supported and configured, with a supported server-side speech provider as an alternative. Keep provider credentials on the server. Generate normal commentary from concise, deterministic event templates, and use contextual AI-generated commentary for selected major moments. Do not call a generative model for every collision or animation frame.
+
+Pre-generate or cache reusable audio where practical to reduce latency and API costs. If speech generation fails, surface the error and use a configured fallback. Do not silently treat a visual banner as successful audio.
+
+The stream must deliver the actual generated audio, not text that merely appears on screen.
+
+---
+
+# 6. SATISFYING SOUND DESIGN
+
+The audio should make the simulation genuinely enjoyable to watch for an extended period.
+
+Use an original, coherent audio palette:
+
+- Low-level arena ambience and crowd atmosphere.
+- Soft, varied token collision sounds.
+- More substantial impacts for higher-energy collisions.
+- Distinct perimeter contact sounds.
+- A smooth rotational or mechanical accent for the deflector bars.
+- A rising, restrained tension effect during hatch preparation.
+- Clear countdown ticks or beats.
+- A deep, satisfying hatch opening and closing effect.
+- A spatially convincing falling sound and elimination accent.
+- Spoken country eliminations.
+- Special audio cues for memberships, supported chat events and detected subscriptions.
+- A powerful but controlled winner fanfare.
+
+Variation must be driven by the actual event. Apply gain scaling, pitch variation and rate limiting according to collision intensity. Avoid turning every minor collision into a loud sound or playing dozens of identical effects simultaneously.
+
+Apply audio ducking so speech takes priority over the music bed and sound effects. Provide independently adjustable volumes, a master mute and a clear indication of audio status.
+
+Keep sound assets locally available and verify their licensing. Do not use copyrighted music or sound effects without appropriate permission.
+
+The final output must contain the same audio heard in the actual livestream, not merely in a local debugging preview.
+
+---
+
+# 7. YOUTUBE LIVE CHAT — A REAL SERVER-SIDE INTEGRATION
+
+Implement the actual YouTube Live Streaming/Data API integration. Do not create a fake live-chat connection.
+
+## Channel connection
+
+Build an administrative connection workflow using OAuth 2.0 for the channel owner.
+
+The application should let the operator:
+
+1. Connect the intended YouTube channel.
+2. See which channel is currently authorized.
+3. Identify or select the active live broadcast.
+4. Retrieve its associated `liveChatId`.
+5. Start or stop event ingestion.
+6. View connection status, last received event, reconnect attempts and errors.
+
+Request only the OAuth scopes needed for the functions actually implemented.
+
+Store refresh tokens securely on the server with appropriate encryption and access controls. Never put OAuth secrets, refresh tokens or private credentials into frontend code, localStorage or committed source files.
+
+## Live chat ingestion
+
+Prefer `liveChatMessages.streamList` for low-latency server-side chat ingestion when the selected client and deployment environment support it. If not, implement a quota-aware fallback using `liveChatMessages.list`, respecting the returned `pollingIntervalMillis` and `nextPageToken`.
+
+Handle network interruptions, reconnects, duplicate events, expired credentials, terminated broadcasts, quota errors and invalid chat IDs without crashing the simulation.
+
+Do not poll at an arbitrary high frequency. The service must back off appropriately and resume from its last known position when possible.
+
+## Viewer participation
+
+Allow viewers to support countries through clearly defined chat commands, such as:
+
+`!support India`
+
+`!support Japan`
+
+`!vote Brazil`
+
+Implement these features with an explicit, configurable ruleset:
+
+- Validate all country identifiers against the authoritative 64-country roster.
+- Associate each accepted vote or support action with a viewer identity and a specific match.
+- Prevent duplicates, abusive repetition and invalid commands.
+- Limit the rate of accepted messages per viewer.
+- Do not accept commands from arbitrary messages that merely mention a country in ordinary conversation.
+- Show a live support leaderboard.
+- Make accepted support changes visible in the interface.
+- Define a configurable threshold for triggering a game effect, where enabled.
+
+Chat must be optional for basic gameplay. A disconnected or quiet chat must not stop the match.
+
+If a qualifying live event awards a shield or another power-up, process it using a validated, visible, configurable rule. A shield should not make a country permanently invulnerable or silently interfere with the underlying elimination rules.
+
+## Live community events
+
+Listen for supported live-chat event types, including applicable Super Chat, Super Sticker and channel-membership events, using the actual event payloads that YouTube returns.
+
+When an event is successfully identified, display an appropriate acknowledgement and generate matching spoken commentary where enabled.
+
+Examples:
+
+- “Welcome to the arena, [verified available display name]!”
+- “A huge thank-you to [display name] for the Super Chat!”
+- “Thank you, [display name], for supporting the channel!”
+
+Never invent an amount, membership tier, event type or viewer name that is absent from the received event.
+
+Add configurable event priorities and a queue so that a large burst of chat activity does not overwhelm the announcer or obscure an elimination.
+
+---
+
+# 8. SUBSCRIBER ANNOUNCEMENTS — BE PRECISE ABOUT WHAT YOUTUBE EXPOSES
+
+Implement subscriber detection using supported data, not fabricated notifications.
+
+For the authenticated channel owner, implement an adapter around the YouTube Data API's `subscriptions.list` endpoint using `myRecentSubscribers=true` where authorized.
+
+The service must:
+
+- Compare retrieved subscription IDs with persisted previously seen IDs.
+- Deduplicate announcements across refreshes and server restarts.
+- Announce a newly detected subscriber only when the available API result actually establishes that the subscriber is new to the observed set.
+- Respect pagination, response limits, quota and configurable polling intervals.
+- Store the last successful check and the newest processed records.
+- Avoid announcing historical subscribers as if they subscribed during the current broadcast.
+
+**Important:** This is not a universal real-time push feed for every subscription. The API may expose only a limited set of recent subscribers, and subscribers whose subscriptions are private may not appear. Never claim that all new subscribers are detected instantly.
+
+Create a visible integration status with clear states such as:
+- Connected; best-effort public subscriber monitoring active.
+- Waiting for channel authorization.
+- Subscriber data unavailable.
+- API quota or permission error.
+
+Support near-real-time announcements for membership-related events actually received through live chat. Optionally allow a separately configurable, authenticated third-party alert webhook if a compatible provider is chosen and its credentials are supplied. Never assume that such a provider has been connected.
+
+Maintain a strict distinction between a detected ordinary subscription, a new channel member, a gifted membership and a Super Chat. They are not interchangeable event types.
+
+---
+
+# 9. LIVE COMMUNITY PANELS AND ON-SCREEN STORYTELLING
+
+Design the spectator overlay to communicate what is happening even when no one is listening to the commentary.
+
+Include:
+
+- Total countries at match start.
+- Current remaining count.
+- Match/cycle number.
+- A visible countdown for the next opening.
+- The latest eliminated country.
+- A compact, recent elimination history.
+- Match progress.
+- The current leading supported countries.
+- Recent accepted chat support.
+- A clear special-event indicator for eligible community contributions.
+- Current champion and cumulative match-win standings.
+- A session champion announcement and final leaderboard when the session ends.
+
+Use concise language, legible type and meaningful visual emphasis. Important information must not compete with the arena or cover critical collisions.
+
+Show the latest elimination prominently and retain enough history for returning viewers to understand recent events. A longer list should be available in the control dashboard rather than crowding the broadcast.
+
+Provide configurable intro, match-end and session-end sequences.
+
+---
+
+# 10. TECHNICAL ARCHITECTURE
+
+Build this as a maintainable full-stack application, not a monolithic file.
+
+Preferred initial stack:
+
+- React and TypeScript for the application interface.
+- Phaser 3 with Matter.js for the real-time 2D arena and physics.
+- Node.js server-side runtime for YouTube API access, OAuth handling, speech generation and event processing.
+- Firebase/Firestore or another suitable persistent database for session history, settings, event deduplication and stored records.
+- Server-side Gemini API integration for selected contextual commentary and TTS where supported.
+- A clear adapter boundary around the YouTube API, speech provider and stream output.
+
+Separate the following subsystems:
+
+1. Arena simulation.
+2. Game state and match lifecycle.
+3. Broadcast rendering.
+4. YouTube authentication and API ingestion.
+5. Event queue and event deduplication.
+6. Commentary text generation.
+7. Text-to-speech and audio mixing.
+8. Session persistence and standings.
+9. Administrative control panel.
+10. Deployment and operational health checks.
+
+Use typed event payloads and a single authoritative country roster. Validate external inputs and treat chat messages as untrusted data.
+
+Keep simulation rendering and high-frequency collision processing in the browser or dedicated rendering worker. Do not send every collision to the server or to Gemini. Send only meaningful, rate-limited events to the commentary and integration services.
+
+Provide structured logs, clear connection diagnostics, recoverable errors, sensible timeouts and resource limits. Include tests for core physics, event deduplication, match transitions, persistence and API error handling.
+
+---
+
+# 11. CLOUD DEPLOYMENT AND ACTUAL YOUTUBE VIDEO OUTPUT
+
+A deployed web application is not automatically a livestream. Build and document the full path from the simulation to the video and audio signal sent to YouTube.
+
+## Application and event backend
+
+Prepare the main full-stack web app for Google Cloud Run deployment. Store credentials in the appropriate server-side secrets system. Provision the selected persistent database, define required environment variables and provide deployment instructions.
+
+Use HTTPS for the public application and OAuth callback URLs. Do not expose secret configuration to the browser.
+
+Provide a protected operator console with:
+- YouTube connection status.
+- Active broadcast and chat status.
+- Simulation controls.
+- Audio controls.
+- Match restart and session reset.
+- Event queue and last-event information.
+- Error and quota diagnostics.
+- A preview of the live broadcast layout.
+
+The public broadcast page should not expose administrative functions.
+
+## Video output
+
+Provide two clearly documented output modes.
+
+**Mode A — Browser/OBS output:** Serve the broadcast composition at a dedicated clean URL suitable for capture as an OBS Browser Source. Ensure the arena animation, commentary and sound effects are available in the capture, without administrative UI. Document how to configure OBS and stream the captured output to YouTube.
+
+**Mode B — Cloud-rendered stream:** Prepare a separate, containerized renderer/encoder service that can render continuously in a cloud environment and send the final audio/video signal to YouTube through the supported RTMPS ingestion path. Evaluate an appropriate persistent worker on Google Compute Engine or another suitable deployment target for a continuously running render/encode process. Do not assume a normal Cloud Run web service will automatically generate and transmit a continuous livestream just because the web app has been deployed.
+
+The cloud renderer must support:
+- A continuously running simulation.
+- Stable frame timing.
+- Correct audio/video synchronization.
+- Automatic reconnection handling.
+- Configurable resolution, frame rate and bitrate.
+- Graceful failure reporting and restart behaviour.
+- Protected YouTube stream configuration.
+- A clean shutdown and restart procedure.
+
+Do not create or start a public live broadcast without explicit operator action. Provide a preflight checklist and a separate explicit Start Streaming action.
+
+If the current AI Studio environment cannot build or run the cloud encoder directly, implement the parts that are supported and deliver the renderer's container specification, configuration schema and exact deployment steps. Clearly identify what has and has not been validated.
+
+Never claim the application is broadcasting to YouTube until a real end-to-end stream test has succeeded.
+
+---
+
+# 12. ADMINISTRATIVE RULES AND CONFIGURATION
+
+Create an admin settings page for:
+
+- Country roster and asset validation.
+- Hazard interval and opening duration.
+- Arena speed and collision tuning.
+- Country support threshold.
+- Viewer power-up rules.
+- Commentary style and voice selection.
+- Voice, music, ambience and effects volumes.
+- Announcement priorities and event queue limits.
+- Match and session settings.
+- Broadcast resolution and orientation.
+- YouTube channel and active broadcast selection.
+- Subscriber monitoring status and polling controls.
+- Cloud renderer configuration and status.
+
+Store non-secret settings persistently. Use the appropriate server-side secret manager for sensitive credentials. Protect all administrative actions with authentication and authorization.
+
+Do not embed a YouTube stream key in a URL, frontend bundle, public configuration file, browser console or log.
+
+---
+
+# 13. DEMO MODE AND REAL LIVE MODE MUST BE SEPARATE
+
+The application needs two explicit operating modes.
+
+**Demo mode**
+- Runs the actual physics simulation.
+- Uses clearly labelled synthetic chat and community events.
+- Allows testing commentary, sound, hazard events, layout and match transitions.
+- Makes no claims that the synthetic events came from YouTube.
+
+**Live mode**
+- Requires a valid connection to the authorized channel and active broadcast.
+- Receives real API events.
+- Shows actual connection and permission status.
+- Never injects fabricated subscribers, memberships, Super Chats, viewer counts or country support.
+- Clearly reports missing credentials, insufficient permissions, API errors and unavailable data.
+
+Do not use hardcoded demo messages in the live-event stream. Make the source of each event identifiable in the admin event log.
+
+---
+
+# 14. REQUIRED ACCEPTANCE TESTS
+
+Before declaring the application complete, launch the actual running application and verify the following.
+
+### Visual and gameplay tests
+
+- All 64 country tokens spawn with the correct flags.
+- No token uses an emoji, generic placeholder or unrelated flag.
+- The arena retains its intended geometry and readable visual hierarchy.
+- Collision and rotation behaviour remain stable during extended gameplay.
+- Hazard warnings match the actual opening time.
+- A fully fitting token physically falls through and is counted only once.
+- Partial rim overlap does not cause arbitrary elimination.
+- The match never declares a winner prematurely.
+- Winner announcements, cumulative wins and next-match transitions work.
+- Horizontal and vertical layouts are separately composed and inspected at their target dimensions.
+
+### Audio tests
+
+- Every confirmed elimination produces an audible announcement with the correct country name.
+- Remaining counts spoken by the announcer match the simulation.
+- Speech, music, impacts and countdown effects are mixed correctly.
+- No persistent audio overlap, excessive collision spam or repeated stale announcement occurs.
+- The actual stream/capture includes speech and effects.
+
+### YouTube integration tests
+
+- OAuth authorization succeeds against a configured channel.
+- The correct active broadcast and live chat are identified.
+- Real chat messages are received and deduplicated.
+- A valid country support command changes the correct counter or support state.
+- Supported membership and fan-funding events are correctly categorized.
+- Subscriber monitoring reports only events established by available real data.
+- Expired credentials, network interruptions and quota exhaustion produce recoverable errors.
+- Demo events cannot accidentally be presented as real events in live mode.
+
+### Deployment tests
+
+- The public app can be deployed with a documented environment configuration.
+- Persistent data survives application restarts.
+- Secret credentials are not exposed to the frontend.
+- OBS output is usable, or the cloud renderer passes a real encoder connectivity test.
+- Audio and video remain synchronized.
+- The application reports honest, observable stream status.
+
+Capture actual screenshots and a demonstration recording. Inspect the output rather than relying only on source code or automated tests.
+
+---
+
+# 15. IMPLEMENTATION STRATEGY
+
+Build this in deliberate stages while preserving a running application.
+
+**Stage 1:** Establish the visual direction and the fully functioning 64-country physics simulation. Make the arena attractive before building a large settings dashboard.
+
+**Stage 2:** Implement the match state machine, hazard anticipation, eliminations, winner flow and session persistence.
+
+**Stage 3:** Add spoken elimination announcements, the commentary queue, crowd ambience and effects mixing.
+
+**Stage 4:** Implement real YouTube OAuth, live-chat event ingestion, support commands and supported community event handling.
+
+**Stage 5:** Implement best-effort public subscriber monitoring, persistence, deduplication and accurate status indicators.
+
+**Stage 6:** Implement the operator console, separate broadcast layouts and cloud deployment packages.
+
+**Stage 7:** Run acceptance tests, record actual gameplay, fix the observed visual and audio defects, and verify that the finished application is genuinely usable.
+
+Do not build a superficial approximation of all seven stages with placeholder integrations. Prioritize a working simulation, a polished broadcast experience and a reliable event architecture.
+
+At the end, deliver:
+- The working application and source files.
+- A list of completed and uncompleted features.
+- The actual screenshot and recording paths.
+- The list of required Google Cloud and YouTube configuration steps.
+- The exact instructions for deploying the app and connecting YouTube.
+- A clear statement of whether an end-to-end live stream was tested successfully.
+
+The objective is a distinctive, high-quality live entertainment experience that viewers want to keep watching—not a feature checklist that only looks complete in a report.
